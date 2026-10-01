@@ -123,4 +123,3 @@ tests/        unit + e2e             scripts/benchmark.py        monitoring/ + d
 .github/workflows/ci.yml  (tests + demo report published to GitHub Pages)
 ```
 
-MIT © Selinne Carlin
