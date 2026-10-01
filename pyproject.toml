@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "formicidae"
+version = "0.1.0"
+description = "Exploratory testing con colonia de hormigas (ACO) + Playwright: encuentra rutas frágiles y genera tests Pytest reproducibles"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["playwright>=1.44", "jinja2>=3.1"]
+
+[project.optional-dependencies]
+metrics = ["prometheus-client>=0.20"]
+dev = ["pytest>=8", "flask>=3", "prometheus-client>=0.20"]
+
+[project.scripts]
+formicidae = "formicidae.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["formicidae*", "demo_app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["e2e: levanta la app demo y ejecuta la colonia completa (~6 min)"]

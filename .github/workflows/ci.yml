@@ -1,0 +1,43 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -e ".[dev]"
+      - run: playwright install --with-deps chromium
+      - name: Unit + e2e (la colonia contra la app demo, tests generados fallan/pasan)
+        run: pytest -q
+
+  demo-report:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions: { pages: write, id-token: write }
+    environment: { name: github-pages, url: "${{ steps.deploy.outputs.page_url }}" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - run: pip install -e ".[dev]"
+      - run: playwright install --with-deps chromium
+      - name: Colonia contra la app demo
+        run: |
+          python -m demo_app.app --port 5000 &
+          sleep 3
+          formicidae run http://127.0.0.1:5000 --seed 42 --out site
+          cp site/report.html site/index.html
+      - uses: actions/upload-artifact@v4
+        with: { name: formicidae-out, path: site }
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+      - id: deploy
+        uses: actions/deploy-pages@v4

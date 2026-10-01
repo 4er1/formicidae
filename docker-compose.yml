@@ -1,0 +1,14 @@
+# Prometheus + Grafana para ver la colonia en vivo.
+#   1) docker compose up -d
+#   2) formicidae run http://127.0.0.1:5000 --metrics-port 8011 --metrics-linger 60
+#   3) Grafana en http://localhost:3000 (admin/admin) -> Data source Prometheus http://prometheus:9090
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes: ["./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    ports: ["9090:9090"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+  grafana:
+    image: grafana/grafana:latest
+    ports: ["3000:3000"]
+    depends_on: [prometheus]
